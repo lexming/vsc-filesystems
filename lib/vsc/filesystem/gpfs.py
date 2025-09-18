@@ -816,6 +816,11 @@ class GpfsOperations(PosixOperations, metaclass=Singleton):
                     GpfsOperationError)
             mmcrfileset_options += ['--inode-space', parent_fileset_name]
 
+        # Enable update of ACL permissions on chmod commands in all cases
+        # default setting is chmodAndSetAcl, which makes chmod update POSIX ACLs, but fully replace NFS4 ACLs
+        # by swithcing to chmodAndUpdateAcl, chmod behaves in the same way (updates) both ACL types
+        mmcrfileset_options += ['--allow-permission-change', 'chmodAndUpdateAcl']
+
         (ec, out) = self._execute('mmcrfileset', mmcrfileset_options, True)
         if ec > 0:
             self.log.raiseException(
