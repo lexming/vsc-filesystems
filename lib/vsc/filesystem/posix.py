@@ -587,7 +587,9 @@ class PosixOperations(metaclass=Singleton):
 
         with tempfile.NamedTemporaryFile() as acl_file:
             self.log.debug(f"Input file for {setfacl_exe} created in: {acl_file.name}")
-            acl_file.write('\n'.join(permissions).encode('utf-8'))
+            acl_entries = '\n'.join(permissions)
+            acl_file.write(acl_entries.encode('utf-8'))
+            self.log.debug(f"Setting POSIX ACLs on '{path}' to:\n{acl_entries}")
 
             setfacl_cmd = [
                 setfacl_exe,
@@ -607,6 +609,7 @@ class PosixOperations(metaclass=Singleton):
         Overwrite ACL permissions in NFSv4 format on given path
         """
         acl_entries = ','.join(permissions)
+        self.log.debug(f"Setting NFSv4 ACLs on '{path}' to: {acl_entries}")
 
         setfacl_exe = 'nfs4_setfacl'
         setfacl_cmd = [
