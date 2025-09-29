@@ -821,6 +821,11 @@ class GpfsOperations(PosixOperations, metaclass=Singleton):
         # by swithcing to chmodAndUpdateAcl, chmod behaves in the same way (updates) both ACL types
         mmcrfileset_options += ['--allow-permission-change', 'chmodAndUpdateAcl']
 
+        # Remove special permissions (i.e. owner, group, everyone) from inheritance rules in ACLs
+        # this allows to control special permissions as usual with mod bits and umask
+        # only named ACLs will be inherited
+        mmcrfileset_options += ['--allow-permission-inherit', 'inheritAclAndAddMode']
+
         (ec, out) = self._execute('mmcrfileset', mmcrfileset_options, True)
         if ec > 0:
             self.log.raiseException(
